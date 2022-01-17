@@ -23,6 +23,9 @@ class CourierCO(Courier):
         self.periodic_reconnect_task = None
         super().preinit()
 
+    # def prepare_db(self) -> None:
+    #     super().prepare_db()
+    #     init_db(self.db)
 
     async def start(self) -> None:
         # self.add_startup_actions(User.init_cls(self))

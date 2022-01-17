@@ -5,7 +5,6 @@ from mautrix.appservice import AppService, ASStateStore
 from mautrix.errors import MExclusive, MUnknownToken
 import sys
 from mautrix.api import HTTPAPI
-# from mautrix.util.bridge_state import BridgeState, BridgeStateEvent
 from mautrix.bridge.config import BaseBridgeConfig
 from mautrix.bridge.matrix import BaseMatrixHandler
 
@@ -65,7 +64,6 @@ class Courier(Program):
         super().prepare()
         # self.prepare_db()
         self.prepare_appservice()
-        # self.prepare_bridge()
 
     def prepare_config(self) -> None:
         self.config = self.config_class(
