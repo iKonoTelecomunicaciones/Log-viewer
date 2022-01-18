@@ -10,4 +10,4 @@ class MatrixHandler(BaseMatrixHandler):
         self.user_id_prefix = f"@{prefix}"
         self.user_id_suffix = f"{suffix}:{homeserver}"
 
-        super().__init__(bridge)
+        super().__init__(bridge=bridge)

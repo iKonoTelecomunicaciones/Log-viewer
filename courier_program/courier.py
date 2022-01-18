@@ -7,6 +7,7 @@ import sys
 from mautrix.api import HTTPAPI
 from mautrix.bridge.config import BaseBridgeConfig
 from mautrix.bridge.matrix import BaseMatrixHandler
+from aiohttp import web
 
 class Courier(Program):
     az: AppService
@@ -17,6 +18,7 @@ class Courier(Program):
     config_class: Type[BaseBridgeConfig]
     config: BaseBridgeConfig
     # manhole: Optional[br.manhole.ManholeState]
+    app: web.Application
 
     def __init__(
         self,
@@ -64,7 +66,7 @@ class Courier(Program):
         super().prepare()
         # self.prepare_db()
         self.prepare_appservice()
-        # self.matrix = self.matrix_class(bridge=self)
+        self.matrix = self.matrix_class(bridge=self)
 
     def prepare_config(self) -> None:
         self.config = self.config_class(
@@ -110,7 +112,7 @@ class Courier(Program):
         self.log.debug("Starting appservice...")
         await self.az.start(self.config["appservice.hostname"], self.config["appservice.port"])
         try:
-            await self.matrix.wait_for_connection(self)
+            await self.matrix.wait_for_connection()
         except MUnknownToken:
             self.log.critical(
                 "The as_token was not accepted. Is the registration file installed "
@@ -125,7 +127,7 @@ class Courier(Program):
             )
             sys.exit(16)
 
-        self.add_startup_actions(self.matrix.init_as_bot(self))
+        self.add_startup_actions(self.matrix.init_as_bot())
         await super().start()
         self.az.ready = True
 
@@ -140,5 +142,5 @@ class Courier(Program):
         #     self.manhole = None
         await self.az.stop()
         await super().stop()
-        if self.matrix.e2ee:
-            await self.matrix.e2ee.stop()
+        # if self.matrix.e2ee:
+        #     await self.matrix.e2ee.stop()
