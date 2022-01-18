@@ -64,6 +64,7 @@ class Courier(Program):
         super().prepare()
         # self.prepare_db()
         self.prepare_appservice()
+        # self.matrix = self.matrix_class(bridge=self)
 
     def prepare_config(self) -> None:
         self.config = self.config_class(

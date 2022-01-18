@@ -9,7 +9,7 @@ class CourierCO(Courier):
     name = "courier-program"
     module = "courier_program"
     command = "python -m courier_program"
-    description = "A appservice for the create users for WhatsApp login"
+    description = "An appservice for the create users for WhatsApp login"
     version = "0.1"
     config_class = Config
     matrix_class = MatrixHandler
