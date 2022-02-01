@@ -1,24 +1,23 @@
-import asyncio
-from typing import Optional, Type
-from mautrix.util.program import Program
-from mautrix.appservice import AppService, ASStateStore
 from mautrix.errors import MExclusive, MUnknownToken
-import sys
-from mautrix.api import HTTPAPI
-from mautrix.bridge.config import BaseBridgeConfig
 from mautrix.bridge.matrix import BaseMatrixHandler
+from mautrix.bridge.config import BaseBridgeConfig
+from mautrix.appservice import AppService
+from mautrix.util.program import Program
+from typing import Optional, Type
+from mautrix.types import UserID
+from mautrix.api import HTTPAPI
 from aiohttp import web
+import asyncio
+import sys
 
-class Courier(Program):
+
+class LogViewer(Program):
     az: AppService
     matrix_class: Type[BaseMatrixHandler]
     matrix: BaseMatrixHandler
     periodic_reconnect_task: Optional[asyncio.Task]
-    state_store: ASStateStore
     config_class: Type[BaseBridgeConfig]
     config: BaseBridgeConfig
-    # manhole: Optional[br.manhole.ManholeState]
-    app: web.Application
 
     def __init__(
         self,
@@ -29,13 +28,10 @@ class Courier(Program):
         version: str = None,
         config_class: Type[BaseBridgeConfig] = None,
         matrix_class: Type[BaseMatrixHandler] = None,
-        state_store_class: Type[ASStateStore] = None,
     ) -> None:
         super().__init__(module, name, description, command, version, config_class)
         if matrix_class:
             self.matrix_class = matrix_class
-        if state_store_class:
-            self.state_store_class = state_store_class
         self.manhole = None
 
     def prepare_arg_parser(self) -> None:
@@ -82,7 +78,6 @@ class Courier(Program):
         print(f"Registration generated and saved to {self.config.registration_path}")
 
     def prepare_appservice(self) -> None:
-        # self.make_state_store()
         mb = 1024 ** 2
         default_http_retry_count = self.config.get("homeserver.http_retry_count", None)
         if self.name not in HTTPAPI.default_ua:
@@ -91,20 +86,13 @@ class Courier(Program):
             server=self.config["homeserver.address"],
             domain=self.config["homeserver.domain"],
             verify_ssl=self.config["homeserver.verify_ssl"],
-            connection_limit=self.config["homeserver.connection_limit"],
             id=self.config["appservice.id"],
             as_token=self.config["appservice.as_token"],
             hs_token=self.config["appservice.hs_token"],
-            tls_cert=self.config.get("appservice.tls_cert", None),
-            tls_key=self.config.get("appservice.tls_key", None),
             bot_localpart=self.config["appservice.bot_username"],
-            ephemeral_events=self.config["appservice.ephemeral_events"],
             default_ua=HTTPAPI.default_ua,
-            default_http_retry_count=default_http_retry_count,
-            log="courier.as",
+            log="logviewer.events",
             loop=self.loop,
-            # state_store=self.state_store,
-            # real_user_content_key=self.real_user_content_key,
             aiohttp_params={"client_max_size": self.config["appservice.max_body_size"] * mb},
         )
 
@@ -127,20 +115,15 @@ class Courier(Program):
             )
             sys.exit(16)
 
-        self.add_startup_actions(self.matrix.init_as_bot())
         await super().start()
         self.az.ready = True
 
-        # status_endpoint = self.config["homeserver.status_endpoint"]
-        # if status_endpoint and await self.count_logged_in_users() == 0:
-        #     state = BridgeState(state_event=BridgeStateEvent.UNCONFIGURED).fill()
-        #     await state.send(status_endpoint, self.az.as_token, self.log)
-
     async def stop(self) -> None:
-        # if self.manhole:
-        #     self.manhole.close()
-        #     self.manhole = None
         await self.az.stop()
         await super().stop()
-        # if self.matrix.e2ee:
-        #     await self.matrix.e2ee.stop()
+
+    async def get_puppet(self, user_id: UserID, create: bool = False) -> None:
+        pass
+
+    async def get_double_puppet(self, user_id: UserID) -> None:
+        pass
