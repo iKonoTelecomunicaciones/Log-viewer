@@ -60,7 +60,6 @@ class LogViewer(Program):
 
     def prepare(self) -> None:
         super().prepare()
-        # self.prepare_db()
         self.prepare_appservice()
         self.matrix = self.matrix_class(bridge=self)
 
