@@ -25,7 +25,7 @@ class LogViewerAppService(LogViewer):
         await super().start()
 
     def prepare_stop(self) -> None:
-        self.log.debug("Stopping puppet syncers")
+        pass
 
     def is_bridge_ghost(self, user_id: UserID) -> bool:
         pass
